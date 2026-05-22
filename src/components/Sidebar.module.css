@@ -1,0 +1,162 @@
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: #111;
+  border-right: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.header {
+  padding: 16px 18px;
+  border-bottom: 1px solid #222;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: -0.6px;
+  line-height: 1;
+}
+
+.tagline {
+  font-size: 10px;
+  font-weight: 500;
+  color: #666;
+  text-transform: lowercase;
+  letter-spacing: 1.2px;
+}
+
+.section {
+  padding: 14px 18px;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.count {
+  background: #222;
+  color: #666;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.pageList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pageBtn {
+  width: 32px;
+  height: 32px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.pageBtn:hover { background: #222; border-color: #333; color: #ccc; }
+.pageBtnActive { background: #0f1d2e !important; border-color: #4A90E2 !important; color: #4A90E2 !important; }
+
+.fieldList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.fieldRow:hover { background: #1a1a1a; }
+.fieldRowSelected { background: #1a1a1a; outline: 1px solid #2e2e2e; }
+
+.fieldType {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.fieldName {
+  flex: 1;
+  font-size: 12px;
+  color: #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fieldPage {
+  font-size: 10px;
+  color: #444;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: #444;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.deleteBtn:hover { color: #e05c5c; background: #2a1515; }
+
+.empty {
+  font-size: 12px;
+  color: #444;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.exportSection {
+  padding: 16px 18px;
+  margin-top: auto;
+  border-top: 1px solid #1e1e1e;
+}
+
+.exportBtn {
+  width: 100%;
+  padding: 10px;
+  background: #4A90E2;
+  border: none;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.exportBtn:hover:not(:disabled) { background: #3a7bd5; }
+.exportBtn:disabled { background: #1e2a38; color: #3a5a7a; cursor: not-allowed; }

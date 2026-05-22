@@ -1,0 +1,209 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 24px;
+  width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dialog h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.input {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: #eee;
+  font-size: 14px;
+  outline: none;
+}
+
+.input:focus { border-color: #4A90E2; }
+.inputError { border-color: #e05c5c !important; }
+
+.textarea {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: #eee;
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.error {
+  color: #e05c5c;
+  font-size: 12px;
+}
+
+.fieldset {
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0;
+}
+
+.fieldset legend {
+  font-size: 12px;
+  color: #666;
+  padding: 0 6px;
+}
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.typeBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.12s;
+}
+
+.typeBtn strong { font-size: 13px; color: #ddd; }
+.typeBtn span   { font-size: 11px; color: #666; }
+.typeBtn:hover  { border-color: #444; }
+
+.typeBtnActive {
+  border-color: #4A90E2 !important;
+  background: #0f1d2e !important;
+}
+.typeBtnActive strong { color: #4A90E2; }
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #ccc;
+  cursor: pointer;
+}
+.radioLabel input { margin-top: 2px; }
+.radioLabel strong { color: #eee; }
+
+.inlineNumber {
+  width: 54px;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: #eee;
+  font-size: 13px;
+  outline: none;
+  text-align: center;
+}
+.inlineNumber:focus { border-color: #4A90E2; }
+.inlineNumber:disabled { opacity: 0.35; }
+
+.checkGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.checkBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #888;
+  transition: border-color 0.12s;
+}
+.checkBtn:hover { border-color: #444; }
+.checkBtnActive { border-color: #50C878 !important; background: #0d1f14 !important; color: #50C878; }
+
+.symbol {
+  font-size: 20px;
+  color: #ccc;
+}
+.checkBtnActive .symbol { color: #50C878; }
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.cancel {
+  padding: 8px 18px;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+}
+.cancel:hover { background: #222; }
+
+.confirm {
+  padding: 8px 18px;
+  background: #4A90E2;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.confirm:hover { background: #3a7bd5; }
