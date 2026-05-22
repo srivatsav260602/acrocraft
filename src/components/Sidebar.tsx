@@ -42,7 +42,7 @@ export function Sidebar() {
     a.href = url;
     a.download = "acrocraft-output.pdf";
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   };
 
   return (

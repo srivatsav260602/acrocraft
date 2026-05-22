@@ -1,15 +1,16 @@
-import { useState } from "react";
-import type { Field, FieldType, OverflowBehaviour, CheckboxStyle } from "../types/field";
+import { useState, useRef, useEffect } from "react";
+import type { Field, FieldType, OverflowBehaviour, CheckboxStyle, TextField, MultilineField, CheckboxField, RadioField, DropdownField, DateField } from "../types/field";
 import styles from "./FieldDialog.module.css";
 
 interface DrawRect { x: number; y: number; w: number; h: number }
 
 interface Props {
-  rect: DrawRect;
-  page: number;
+  rect?: DrawRect;
+  page?: number;
   existingNames: string[];
   onConfirm: (field: Field) => void;
   onCancel: () => void;
+  editingField?: Field;
 }
 
 const FIELD_TYPES: { value: FieldType; label: string; description: string }[] = [
@@ -36,26 +37,90 @@ const CHECKBOX_STYLES: { value: CheckboxStyle; label: string; symbol: string }[]
   { value: "star",    label: "Star",      symbol: "★" },
 ];
 
-export function FieldDialog({ rect, page, existingNames, onConfirm, onCancel }: Props) {
-  const [type, setType] = useState<FieldType>("text");
-  const [name, setName] = useState("");
-  const [overflow, setOverflow] = useState<OverflowBehaviour>("shrink");
-  const [checkStyle, setCheckStyle] = useState<CheckboxStyle>("check");
-  const [required, setRequired] = useState(false);
-  const [radioGroup, setRadioGroup] = useState("");
-  const [radioValue, setRadioValue] = useState("");
-  const [dropdownOptions, setDropdownOptions] = useState("");
-  const [dateFormat, setDateFormat] = useState("DD-MM-YYYY");
+export function FieldDialog({ rect, page, existingNames, onConfirm, onCancel, editingField }: Props) {
+  const isEditing = !!editingField;
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const dragRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      setOffset({
+        x: e.clientX - dragStartRef.current.x,
+        y: e.clientY - dragStartRef.current.y,
+      });
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCancel();
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onCancel]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') return;
+    isDraggingRef.current = true;
+    dragStartRef.current = {
+      x: e.clientX - offset.x,
+      y: e.clientY - offset.y,
+    };
+  };
+
+  const [type, setType] = useState<FieldType>(editingField?.type || "text");
+  const [name, setName] = useState(editingField?.name || "");
+  const [overflow, setOverflow] = useState<OverflowBehaviour>(
+    (editingField && "overflow" in editingField) ? editingField.overflow : "shrink"
+  );
+  const [checkStyle, setCheckStyle] = useState<CheckboxStyle>(
+    (editingField && "checkStyle" in editingField) ? editingField.checkStyle : "check"
+  );
+  const [required, setRequired] = useState(
+    (editingField && "required" in editingField) ? editingField.required : false
+  );
+  const [radioGroup, setRadioGroup] = useState(
+    (editingField && editingField.type === "radio") ? editingField.group : ""
+  );
+  const [radioValue, setRadioValue] = useState(
+    (editingField && editingField.type === "radio") ? editingField.value : ""
+  );
+  const [dropdownOptions, setDropdownOptions] = useState(
+    (editingField && editingField.type === "dropdown") ? editingField.options.join("\n") : ""
+  );
+  const [dateFormat, setDateFormat] = useState(
+    (editingField && editingField.type === "date") ? editingField.format : "DD-MM-YYYY"
+  );
   const [nameError, setNameError] = useState("");
-  const [fontSizeAuto, setFontSizeAuto] = useState(true);
-  const [fontSize, setFontSize] = useState(10);
+  const [fontSizeAuto, setFontSizeAuto] = useState(
+    !editingField || !("fontSize" in editingField) || editingField.fontSize === 0
+  );
+  const [fontSize, setFontSize] = useState(
+    (editingField && "fontSize" in editingField && editingField.fontSize > 0) ? editingField.fontSize : 10
+  );
 
   const needsOverflow = type === "text" || type === "multiline" || type === "date" || type === "dropdown";
   const needsCheckStyle = type === "checkbox" || type === "radio";
 
   const validate = () => {
     if (!name.trim()) { setNameError("Field name is required"); return false; }
-    if (existingNames.includes(name.trim())) { setNameError("Name already used on this form"); return false; }
+    const otherNames = existingNames.filter(n => n !== editingField?.name);
+    if (otherNames.includes(name.trim())) { setNameError("Name already used on this form"); return false; }
     if (!/^[a-zA-Z0-9_-]+$/.test(name.trim())) { setNameError("Only letters, numbers, _ and - allowed"); return false; }
     setNameError("");
     return true;
@@ -63,29 +128,66 @@ export function FieldDialog({ rect, page, existingNames, onConfirm, onCancel }: 
 
   const handleConfirm = () => {
     if (!validate()) return;
-    const base = { id: crypto.randomUUID(), name: name.trim(), page, x: rect.x, y: rect.y, width: rect.w, height: rect.h };
+
+    const baseFields = {
+      id: editingField?.id || crypto.randomUUID(),
+      name: name.trim(),
+      page: editingField?.page || page!,
+      x: editingField?.x || rect!.x,
+      y: editingField?.y || rect!.y,
+      width: editingField?.width || rect!.w,
+      height: editingField?.height || rect!.h,
+    };
+
     let field: Field;
     switch (type) {
       case "text":
-        field = { ...base, type: "text", overflow, multiline: false, required, defaultValue: "", fontSize: fontSizeAuto ? 0 : fontSize }; break;
+        field = { ...baseFields, type: "text", overflow, multiline: false, required, defaultValue: (editingField?.type === "text" && "defaultValue" in editingField) ? editingField.defaultValue : "", fontSize: fontSizeAuto ? 0 : fontSize } as TextField; break;
       case "multiline":
-        field = { ...base, type: "multiline", overflow, multiline: true, required, defaultValue: "", fontSize: fontSizeAuto ? 0 : fontSize }; break;
+        field = { ...baseFields, type: "multiline", overflow, multiline: true, required, defaultValue: (editingField?.type === "multiline" && "defaultValue" in editingField) ? editingField.defaultValue : "", fontSize: fontSizeAuto ? 0 : fontSize } as MultilineField; break;
       case "checkbox":
-        field = { ...base, type: "checkbox", checkStyle, defaultChecked: false, required }; break;
+        field = { ...baseFields, type: "checkbox", checkStyle, defaultChecked: (editingField?.type === "checkbox" && "defaultChecked" in editingField) ? editingField.defaultChecked : false, required } as CheckboxField; break;
       case "radio":
-        field = { ...base, type: "radio", group: radioGroup || name.trim(), value: radioValue || name.trim(), checkStyle }; break;
+        field = { ...baseFields, type: "radio", group: radioGroup || name.trim(), value: radioValue || name.trim(), checkStyle } as RadioField; break;
       case "dropdown":
-        field = { ...base, type: "dropdown", options: dropdownOptions.split("\n").map(s => s.trim()).filter(Boolean), defaultValue: "", required, fontSize: fontSizeAuto ? 0 : fontSize }; break;
+        field = { ...baseFields, type: "dropdown", options: dropdownOptions.split("\n").map(s => s.trim()).filter(Boolean), defaultValue: (editingField?.type === "dropdown" && "defaultValue" in editingField) ? editingField.defaultValue : "", required, fontSize: fontSizeAuto ? 0 : fontSize } as DropdownField; break;
       case "date":
-        field = { ...base, type: "date", format: dateFormat, overflow, required, fontSize: fontSizeAuto ? 0 : fontSize }; break;
+        field = { ...baseFields, type: "date", format: dateFormat, overflow, required, fontSize: fontSizeAuto ? 0 : fontSize } as DateField; break;
     }
     onConfirm(field!);
   };
 
   return (
     <div className={styles.backdrop}>
-      <div className={styles.dialog}>
-        <h2>Configure field</h2>
+      <div
+        ref={dragRef}
+        className={styles.dialog}
+        style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
+        onMouseDown={handleMouseDown}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <h2 style={{ cursor: 'grab', userSelect: 'none', margin: 0, flex: 1 }}>
+            {isEditing ? "Edit field" : "Configure field"}
+          </h2>
+          <button
+            onClick={onCancel}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#888',
+              fontSize: '24px',
+              cursor: 'pointer',
+              padding: '0 4px',
+              lineHeight: 1,
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#ccc')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#888')}
+            title="Close (Esc)"
+          >
+            ✕
+          </button>
+        </div>
 
         <label className={styles.label}>Field name
           <input
@@ -98,15 +200,16 @@ export function FieldDialog({ rect, page, existingNames, onConfirm, onCancel }: 
           {nameError && <span className={styles.error}>{nameError}</span>}
         </label>
 
-        <fieldset className={styles.fieldset}>
-          <legend>Field type</legend>
+        <fieldset className={styles.fieldset} disabled={isEditing}>
+          <legend>Field type {isEditing && "(cannot change)"}</legend>
           <div className={styles.typeGrid}>
             {FIELD_TYPES.map((t) => (
               <button
                 key={t.value}
                 className={`${styles.typeBtn} ${type === t.value ? styles.typeBtnActive : ""}`}
-                onClick={() => setType(t.value)}
+                onClick={() => !isEditing && setType(t.value)}
                 type="button"
+                disabled={isEditing}
               >
                 <strong>{t.label}</strong>
                 <span>{t.description}</span>
@@ -214,7 +317,7 @@ export function FieldDialog({ rect, page, existingNames, onConfirm, onCancel }: 
 
         <div className={styles.actions}>
           <button className={styles.cancel} onClick={onCancel} type="button">Cancel</button>
-          <button className={styles.confirm} onClick={handleConfirm} type="button">Add field</button>
+          <button className={styles.confirm} onClick={handleConfirm} type="button">{isEditing ? "Update field" : "Add field"}</button>
         </div>
       </div>
     </div>

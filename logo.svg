@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <g transform="translate(600 315)">
+    <text x="0" y="0"
+          text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+          font-size="180"
+          font-weight="700"
+          fill="#000000"
+          letter-spacing="-6">acrocraft</text>
+    <text x="0" y="80"
+          text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+          font-size="40"
+          font-weight="500"
+          fill="#666666"
+          letter-spacing="12">pdf to form</text>
+  </g>
+</svg>
